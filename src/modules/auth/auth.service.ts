@@ -89,7 +89,39 @@ const loginUser = async (payload: ILoginUser) => {
   };
 };
 
+const refreshToken = async (refreshToken: string) => {
+  const verifiedRefreshToken = jwtUtils.verifyToken(
+    refreshToken,
+    config.jwt_refresh_secret,
+  );
+
+  const { id } = verifiedRefreshToken;
+
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id },
+  });
+
+  if (user.status === UserStatus.BLOCKED) {
+    throw new AppError(HttpStatus.FORBIDDEN, "Your account has been blocked.");
+  }
+
+  const jwtPayload: IJwtPayload = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  };
+
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in,
+  );
+
+  return accessToken;
+};
+
 export const authService = {
   registerUserIntoDB,
   loginUser,
+  refreshToken,
 };
