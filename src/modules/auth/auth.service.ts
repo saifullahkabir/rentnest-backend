@@ -1,8 +1,8 @@
 import HttpStatus from "http-status";
 import bcrypt from "bcryptjs";
-import { UserRole } from "../../../generated/prisma/enums";
+import { UserRole, UserStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
-import { IRegisterUser } from "./auth.interface";
+import { ILoginUser, IRegisterUser } from "./auth.interface";
 import config from "../../config";
 import AppError from "../../utils/AppError";
 
@@ -46,6 +46,37 @@ const registerUserIntoDB = async (payload: IRegisterUser) => {
   return result;
 };
 
+const loginUser = async (payload: ILoginUser) => {
+  const { email, password } = payload;
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new AppError(HttpStatus.NOT_FOUND, "User not found.");
+  }
+
+  const isPasswordMatched = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordMatched) {
+    throw new AppError(HttpStatus.UNAUTHORIZED, "Invalid credentials.");
+  }
+
+  if (user.status !== UserStatus.ACTIVE) {
+    throw new AppError(HttpStatus.FORBIDDEN, "Your account has been banned.");
+  }
+
+  const jwtPayload = {
+    id: user.id,
+    email: user.name,
+    role: user.role,
+  };
+
+  
+};
+
 export const authService = {
   registerUserIntoDB,
+  loginUser,
 };

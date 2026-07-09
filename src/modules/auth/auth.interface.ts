@@ -8,3 +8,8 @@ export interface IRegisterUser {
   phone?: string;
   profileImage?: string;
 }
+
+export interface ILoginUser {
+  email: string;
+  password: string;
+}
