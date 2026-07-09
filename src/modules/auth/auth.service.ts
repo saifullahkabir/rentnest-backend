@@ -5,6 +5,7 @@ import { prisma } from "../../lib/prisma";
 import { ILoginUser, IRegisterUser } from "./auth.interface";
 import config from "../../config";
 import AppError from "../../utils/AppError";
+import { IJwtPayload, jwtUtils } from "../../utils/jwt";
 
 const registerUserIntoDB = async (payload: IRegisterUser) => {
   const { email, password, role } = payload;
@@ -24,10 +25,7 @@ const registerUserIntoDB = async (payload: IRegisterUser) => {
     throw new AppError(HttpStatus.CONFLICT, "User already exists.");
   }
 
-  const hashedPassword = await bcrypt.hash(
-    password,
-    Number(config.bcrypt_salt_rounds),
-  );
+  const hashedPassword = await bcrypt.hash(password, config.bcrypt_salt_rounds);
 
   const result = await prisma.user.create({
     data: {
@@ -63,17 +61,32 @@ const loginUser = async (payload: ILoginUser) => {
     throw new AppError(HttpStatus.UNAUTHORIZED, "Invalid credentials.");
   }
 
-  if (user.status !== UserStatus.ACTIVE) {
-    throw new AppError(HttpStatus.FORBIDDEN, "Your account has been banned.");
+  if (user.status === UserStatus.BLOCKED) {
+    throw new AppError(HttpStatus.FORBIDDEN, "Your account has been blocked.");
   }
 
-  const jwtPayload = {
+  const jwtPayload: IJwtPayload = {
     id: user.id,
-    email: user.name,
+    email: user.email,
     role: user.role,
   };
 
-  
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in,
+  );
+
+  const refreshToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in,
+  );
+
+  return {
+    accessToken,
+    refreshToken,
+  };
 };
 
 export const authService = {
