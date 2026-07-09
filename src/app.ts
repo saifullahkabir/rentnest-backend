@@ -4,6 +4,7 @@ import config from "./config";
 import cookieParser from "cookie-parser";
 import { authRoutes } from "./modules/auth/auth.route";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
+import { notFound } from "./middlewares/notFound";
 
 const app: Application = express();
 
@@ -27,7 +28,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/auth", authRoutes);
 
-
-app.use(globalErrorHandler)
+app.use(notFound);
+app.use(globalErrorHandler);
 
 export default app;
