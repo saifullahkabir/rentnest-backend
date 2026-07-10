@@ -216,14 +216,55 @@ const updateRentalRequestStatus = async (
     );
   }
 
-  const result = await prisma.rentalRequest.update({
-    where: {
-      id: requestId,
-    },
+  //* If rejected, only the status will be updated
+  if (payload.status === RentalRequestStatus.REJECTED) {
+    return await prisma.rentalRequest.update({
+      where: {
+        id: requestId,
+      },
+      data: {
+        status: RentalRequestStatus.REJECTED,
+      },
+    });
+  }
 
-    data: {
-      status: payload.status,
-    },
+  //* If approved, the transaction will proceed.
+  const result = await prisma.$transaction(async (tx) => {
+    //* 1. Selected request approve
+    const updatedRequest = await tx.rentalRequest.update({
+      where: {
+        id: requestId,
+      },
+      data: {
+        status: RentalRequestStatus.APPROVED,
+      },
+    });
+
+    //* 2. Property unavailable
+    await tx.property.update({
+      where: {
+        id: request.propertyId,
+      },
+      data: {
+        availability: PropertyAvailability.UNAVAILABLE,
+      },
+    });
+
+    //* 3. Other pending requests reject
+    await tx.rentalRequest.updateMany({
+      where: {
+        propertyId: request.propertyId,
+        status: RentalRequestStatus.PENDING,
+        NOT: {
+          id: requestId,
+        },
+      },
+      data: {
+        status: RentalRequestStatus.REJECTED,
+      },
+    });
+
+    return updatedRequest;
   });
 
   return result;
