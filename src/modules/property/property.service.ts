@@ -101,9 +101,27 @@ const deleteProperty = async (propertyId: string, landlordId: string) => {
   });
 };
 
+const getAllProperties = async () => {
+  const properties = await prisma.property.findMany({
+    include: {
+      category: true,
+      landlord: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  return properties;
+};
+
 export const propertyService = {
   createProperty,
   getMyProperties,
   updateProperty,
   deleteProperty,
+  getAllProperties,
 };

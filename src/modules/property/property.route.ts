@@ -5,6 +5,9 @@ import { propertyController } from "./property.controller";
 
 const router = Router();
 
+//* Public
+router.get("/", propertyController.getAllProperties);
+
 //* Landlord
 router.post(
   "/landlord",
