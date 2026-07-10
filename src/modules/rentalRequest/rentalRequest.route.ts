@@ -18,13 +18,12 @@ router.get(
   rentalRequestController.getMyRequests,
 );
 
-
-
-// router.get(
-//   "/landlord",
-//   auth(UserRole.LANDLORD),
-//   rentalRequestController.getLandlordRequests,
-// );
+//* landlord
+router.get(
+  "/landlord",
+  auth(UserRole.LANDLORD),
+  rentalRequestController.getLandlordRequests,
+);
 
 // router.get("/:id", auth(), rentalRequestController.getSingleRentalRequest);
 
