@@ -1,13 +1,17 @@
 model Review {
-  id         String   @id @default(uuid())
-  rating     Int
-  comment    String
-  tenantId   String
+  id String @id @default(uuid())
+
+  tenantId String
+  tenant   User   @relation(fields: [tenantId], references: [id])
+
   propertyId String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
   property   Property @relation(fields: [propertyId], references: [id])
-  tenant     User     @relation(fields: [tenantId], references: [id])
+
+  rating  Int
+  comment String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("reviews")
 }
