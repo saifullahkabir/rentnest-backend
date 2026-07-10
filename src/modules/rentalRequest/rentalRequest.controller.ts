@@ -23,6 +23,21 @@ const createRentalRequest = catchAsync(
   },
 );
 
+const getMyRequests = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const tenantId = req.user?.id as string;
+    const result = await rentalRequestService.getMyRequests(tenantId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatus.OK,
+      message: "Rental requests retrieved successfully.",
+      data: result,
+    });
+  },
+);
+
 export const rentalRequestController = {
   createRentalRequest,
+  getMyRequests
 };

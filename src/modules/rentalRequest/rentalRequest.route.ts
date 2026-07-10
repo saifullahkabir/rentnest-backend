@@ -5,17 +5,20 @@ import { rentalRequestController } from "./rentalRequest.controller";
 
 const router = Router();
 
+//* tenant
 router.post(
   "/",
   auth(UserRole.TENANT),
   rentalRequestController.createRentalRequest,
 );
 
-// router.get(
-//   "/my-requests",
-//   auth(UserRole.TENANT),
-//   rentalRequestController.getMyRequests,
-// );
+router.get(
+  "/my-requests",
+  auth(UserRole.TENANT),
+  rentalRequestController.getMyRequests,
+);
+
+
 
 // router.get(
 //   "/landlord",
