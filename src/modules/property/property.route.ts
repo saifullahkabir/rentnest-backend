@@ -24,10 +24,10 @@ router.put(
   propertyController.updateProperty,
 );
 
-// router.delete(
-//   "/landlord/:id",
-//   auth(UserRole.LANDLORD),
-//   propertyController.deleteProperty,
-// );
+router.delete(
+  "/landlord/:id",
+  auth(UserRole.LANDLORD),
+  propertyController.deleteProperty,
+);
 
 export const propertyRoutes = router;

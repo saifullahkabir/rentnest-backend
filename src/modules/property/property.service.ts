@@ -76,8 +76,34 @@ const updateProperty = async (
   return result;
 };
 
+const deleteProperty = async (propertyId: string, landlordId: string) => {
+  const property = await prisma.property.findUnique({
+    where: {
+      id: propertyId,
+    },
+  });
+
+  if (!property) {
+    throw new AppError(HttpStatus.NOT_FOUND, "Property not found.");
+  }
+
+  if (property.landlordId !== landlordId) {
+    throw new AppError(
+      HttpStatus.FORBIDDEN,
+      "You are not allowed to delete this property.",
+    );
+  }
+
+  await prisma.property.delete({
+    where: {
+      id: propertyId,
+    },
+  });
+};
+
 export const propertyService = {
   createProperty,
   getMyProperties,
   updateProperty,
+  deleteProperty,
 };
