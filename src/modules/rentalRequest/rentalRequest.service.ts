@@ -117,8 +117,59 @@ const getLandlordRequests = async (landlordId: string) => {
   return result;
 };
 
+const getSingleRentalRequest = async (requestId: string, userId: string) => {
+  const request = await prisma.rentalRequest.findUnique({
+    where: {
+      id: requestId,
+    },
+
+    include: {
+      tenant: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profileImage: true,
+        },
+      },
+
+      property: {
+        include: {
+          category: true,
+
+          landlord: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              profileImage: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!request) {
+    throw new AppError(HttpStatus.NOT_FOUND, "Rental request not found.");
+  }
+
+  const isTenant = request.tenantId === userId;
+  const isLandlord = request.property.landlordId === userId;
+
+  if (!isTenant && !isLandlord) {
+    throw new AppError(
+      HttpStatus.FORBIDDEN,
+      "You are not allowed to access this rental request.",
+    );
+  }
+
+  return request;
+};
+
 export const rentalRequestService = {
   createRentalRequest,
   getMyRequests,
   getLandlordRequests,
+  getSingleRentalRequest,
 };

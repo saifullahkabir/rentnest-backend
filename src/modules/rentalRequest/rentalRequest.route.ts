@@ -25,12 +25,12 @@ router.get(
   rentalRequestController.getLandlordRequests,
 );
 
-// router.get("/:id", auth(), rentalRequestController.getSingleRentalRequest);
+router.get("/:id", auth(), rentalRequestController.getSingleRentalRequest);
 
-// router.patch(
-//   "/:id",
-//   auth(UserRole.LANDLORD),
-//   rentalRequestController.updateRentalRequestStatus,
-// );
+router.patch(
+  "/landlord/:id",
+  auth(UserRole.LANDLORD),
+  rentalRequestController.updateRentalRequestStatus,
+);
 
 export const rentalRequestRoutes = router;
