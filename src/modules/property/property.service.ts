@@ -194,6 +194,8 @@ const getAllProperties = async (query: IPropertyQuery) => {
           id: true,
           name: true,
           email: true,
+          phone: true,
+          profileImage: true,
         },
       },
     },
@@ -218,10 +220,51 @@ const getAllProperties = async (query: IPropertyQuery) => {
   };
 };
 
+const getSingleProperty = async (propertyId: string) => {
+  const property = await prisma.property.findUnique({
+    where: {
+      id: propertyId,
+    },
+
+    include: {
+      category: true,
+
+      landlord: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          profileImage: true,
+        },
+      },
+
+      reviews: {
+        include: {
+          tenant: {
+            select: {
+              id: true,
+              name: true,
+              profileImage: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!property) {
+    throw new AppError(HttpStatus.NOT_FOUND, "Property not found.");
+  }
+
+  return property;
+};
+
 export const propertyService = {
   createProperty,
   getMyProperties,
   updateProperty,
   deleteProperty,
   getAllProperties,
+  getSingleProperty,
 };

@@ -89,10 +89,25 @@ const getAllProperties = catchAsync(
   },
 );
 
+const getSingleProperty = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const propertyId = req.params.id as string;
+    const result = await propertyService.getSingleProperty(propertyId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatus.OK,
+      message: "Property retrieved successfully.",
+      data: result,
+    });
+  },
+);
+
 export const propertyController = {
   createProperty,
   getMyProperties,
   updateProperty,
   deleteProperty,
   getAllProperties,
+  getSingleProperty,
 };

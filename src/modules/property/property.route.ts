@@ -7,6 +7,7 @@ const router = Router();
 
 //* Public
 router.get("/", propertyController.getAllProperties);
+router.get("/:id", propertyController.getSingleProperty);
 
 //* Landlord
 router.post(
