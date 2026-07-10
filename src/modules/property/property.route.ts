@@ -18,11 +18,11 @@ router.get(
   propertyController.getMyProperties,
 );
 
-// router.patch(
-//   "/landlord/:id",
-//   auth(UserRole.LANDLORD),
-//   propertyController.updateProperty,
-// );
+router.put(
+  "/landlord/:id",
+  auth(UserRole.LANDLORD),
+  propertyController.updateProperty,
+);
 
 // router.delete(
 //   "/landlord/:id",
