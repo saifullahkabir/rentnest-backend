@@ -7,7 +7,6 @@ const router = Router();
 
 //* Public
 router.get("/", propertyController.getAllProperties);
-router.get("/:id", propertyController.getSingleProperty);
 
 //* Landlord
 router.post(
@@ -33,5 +32,8 @@ router.delete(
   auth(UserRole.LANDLORD),
   propertyController.deleteProperty,
 );
+
+//* Public
+router.get("/:id", propertyController.getSingleProperty);
 
 export const propertyRoutes = router;
