@@ -5,5 +5,6 @@ export interface ICreateProperty {
   location: string;
   bedrooms: number;
   bathrooms: number;
+  image: string;
   categoryId: string;
 }

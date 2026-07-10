@@ -8,6 +8,8 @@ model Property {
   bedrooms    Int
   bathrooms   Int
 
+  image String
+
   availability PropertyAvailability @default(AVAILABLE)
 
   landlordId String

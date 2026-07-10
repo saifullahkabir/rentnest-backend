@@ -24,6 +24,25 @@ const createProperty = async (payload: ICreateProperty, landlordId: string) => {
   return result;
 };
 
+const getMyProperties = async (landlordId: string) => {
+  const result = await prisma.property.findMany({
+    where: {
+      landlordId,
+    },
+
+    include: {
+      category: true,
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result;
+};
+
 export const propertyService = {
   createProperty,
+  getMyProperties,
 };

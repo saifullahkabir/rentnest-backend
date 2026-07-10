@@ -20,6 +20,22 @@ const createProperty = catchAsync(
   },
 );
 
+const getMyProperties = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await propertyService.getMyProperties(
+      req.user?.id as string,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatus.OK,
+      message: "Properties retrieved successfully.",
+      data: result,
+    });
+  },
+);
+
 export const propertyController = {
   createProperty,
+  getMyProperties
 };

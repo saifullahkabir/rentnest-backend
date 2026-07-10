@@ -12,6 +12,12 @@ router.post(
   propertyController.createProperty,
 );
 
+router.get(
+  "/landlord",
+  auth(UserRole.LANDLORD),
+  propertyController.getMyProperties,
+);
+
 // router.patch(
 //   "/landlord/:id",
 //   auth(UserRole.LANDLORD),
