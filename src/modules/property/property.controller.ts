@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { propertyService } from "./property.service";
 import { sendResponse } from "../../utils/sendResponse";
+import { IPropertyQuery } from "./property.interface";
 
 const createProperty = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -74,13 +75,16 @@ const deleteProperty = catchAsync(
 //* public
 const getAllProperties = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const result = await propertyService.getAllProperties();
+    const query = req.query as IPropertyQuery;
+
+    const result = await propertyService.getAllProperties(query);
 
     sendResponse(res, {
       success: true,
       statusCode: HttpStatus.OK,
       message: "Properties retrieved successfully.",
-      data: result,
+      data: result.data,
+      meta: result.meta,
     });
   },
 );
