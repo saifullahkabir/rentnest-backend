@@ -66,8 +66,42 @@ const updateCategory = async (categoryId: string, payload: IUpdateCategory) => {
   return result;
 };
 
+const deleteCategory = async (categoryId: string) => {
+  const category = await prisma.category.findUnique({
+    where: {
+      id: categoryId,
+    },
+  });
+
+  if (!category) {
+    throw new AppError(HttpStatus.NOT_FOUND, "Category not found.");
+  }
+
+  const property = await prisma.property.findFirst({
+    where: {
+      categoryId,
+    },
+  });
+
+  if (property) {
+    throw new AppError(
+      HttpStatus.BAD_REQUEST,
+      "Cannot delete category because it is being used by properties.",
+    );
+  }
+
+  const result = await prisma.category.delete({
+    where: {
+      id: categoryId,
+    },
+  });
+
+  return result;
+};
+
 export const categoryService = {
   createCategory,
   getAllCategories,
   updateCategory,
+  deleteCategory,
 };
