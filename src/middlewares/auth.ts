@@ -24,23 +24,23 @@ export const auth = (...roles: UserRole[]) => {
 
     const verifiedToken = jwtUtils.verifyToken(token, config.jwt_access_secret);
 
-    const { id, email, role } = verifiedToken;
-
-    if (roles.length && !roles.includes(role)) {
-      throw new AppError(
-        HttpStatus.FORBIDDEN,
-        "Forbidden. You don't have permission to access this resource",
-      );
-    }
+    const { id } = verifiedToken;
 
     const user = await prisma.user.findUnique({
       where: { id },
+
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+      },
     });
 
     if (!user) {
       throw new AppError(
-        HttpStatus.NOT_FOUND,
-        "User not found. Please login again.",
+        HttpStatus.UNAUTHORIZED,
+        "Invalid token. Please login again.",
       );
     }
 
@@ -51,7 +51,18 @@ export const auth = (...roles: UserRole[]) => {
       );
     }
 
-    req.user = { id, email, role };
+    if (roles.length && !roles.includes(user.role)) {
+      throw new AppError(
+        HttpStatus.FORBIDDEN,
+        "Forbidden. You don't have permission to access this resource",
+      );
+    }
+
+    req.user = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    };
 
     next();
   });
