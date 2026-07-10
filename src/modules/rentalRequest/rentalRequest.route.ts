@@ -25,12 +25,13 @@ router.get(
   rentalRequestController.getLandlordRequests,
 );
 
-router.get("/:id", auth(), rentalRequestController.getSingleRentalRequest);
-
 router.patch(
   "/landlord/:id",
   auth(UserRole.LANDLORD),
   rentalRequestController.updateRentalRequestStatus,
 );
+
+//* Shared (Tenant or Landlord)
+router.get("/:id", auth(), rentalRequestController.getSingleRentalRequest);
 
 export const rentalRequestRoutes = router;
