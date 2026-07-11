@@ -61,7 +61,7 @@ git clone https://github.com/saifullahkabir/rentnest-backend.git
 Move into the project
 
 ```bash
-cd RentNest-Backend
+cd rentnest-backend
 ```
 
 Install dependencies
