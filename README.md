@@ -55,7 +55,7 @@ A RESTful backend API for a rental property marketplace where landlords can mana
 Clone the repository
 
 ```bash
-git clone <https://github.com/saifullahkabir/rentnest-backend.git>
+git clone https://github.com/saifullahkabir/rentnest-backend.git
 ```
 
 Move into the project
