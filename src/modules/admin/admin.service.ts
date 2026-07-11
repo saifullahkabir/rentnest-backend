@@ -1,5 +1,8 @@
 import HttpStatus from "http-status";
 import { prisma } from "../../lib/prisma";
+import { IUpdateUserStatus } from "./admin.interface";
+import AppError from "../../utils/AppError";
+import { UserStatus } from "../../../generated/prisma/enums";
 
 const getAllUsers = async () => {
   const result = await prisma.user.findMany({
@@ -20,6 +23,58 @@ const getAllUsers = async () => {
   return result;
 };
 
+const updateUserStatus = async (
+  userId: string,
+  adminId: string,
+  payload: IUpdateUserStatus,
+) => {
+  if (userId === adminId) {
+    throw new AppError(
+      HttpStatus.BAD_REQUEST,
+      "You cannot update your own status.",
+    );
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!user) {
+    throw new AppError(HttpStatus.NOT_FOUND, "User not found.");
+  }
+
+  if (
+    payload.status !== UserStatus.ACTIVE &&
+    payload.status !== UserStatus.BLOCKED
+  ) {
+    throw new AppError(
+      HttpStatus.BAD_REQUEST,
+      "Status must be ACTIVE or BLOCKED.",
+    );
+  }
+
+  const result = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      status: payload.status,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      status: true,
+    },
+  });
+
+  return result;
+};
+
 export const adminService = {
   getAllUsers,
+  updateUserStatus,
 };

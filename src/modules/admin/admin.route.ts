@@ -20,10 +20,10 @@ router.get("/users", auth(UserRole.ADMIN), adminController.getAllUsers);
 //   adminController.getAllRentalRequests,
 // );
 
-// router.patch(
-//   "/users/:id",
-//   auth(UserRole.ADMIN),
-//   adminController.updateUserStatus,
-// );
+router.patch(
+  "/users/:id",
+  auth(UserRole.ADMIN),
+  adminController.updateUserStatus,
+);
 
 export const adminRoutes = router;
