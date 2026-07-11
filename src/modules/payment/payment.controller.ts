@@ -51,8 +51,22 @@ const getMyPayments = catchAsync(
   },
 );
 
+const getLandlordPayments = catchAsync(async (req: Request, res: Response) => {
+  const landlordId = req.user?.id as string;
+
+  const result = await paymentService.getLandlordPayments(landlordId);
+
+  return sendResponse(res, {
+    success: true,
+    statusCode: HttpStatus.OK,
+    message: "Payments retrieved successfully.",
+    data: result,
+  });
+});
+
 export const paymentController = {
   createPayment,
-   confirmPayment,
-   getMyPayments
+  confirmPayment,
+  getMyPayments,
+  getLandlordPayments,
 };

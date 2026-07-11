@@ -18,4 +18,10 @@ router.get(
   paymentController.getMyPayments,
 );
 
+router.get(
+  "/landlord",
+  auth(UserRole.LANDLORD),
+  paymentController.getLandlordPayments,
+);
+
 export const paymentRoutes = router;

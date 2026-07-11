@@ -162,8 +162,48 @@ const getMyPayments = async (tenantId: string) => {
   return result;
 };
 
+const getLandlordPayments = async (landlordId: string) => {
+  const result = await prisma.payment.findMany({
+    where: {
+      rentalRequest: {
+        property: {
+          landlordId,
+        },
+      },
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+
+    include: {
+      tenant: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profileImage: true,
+        },
+      },
+
+      rentalRequest: {
+        include: {
+          property: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
 export const paymentService = {
   createPayment,
   confirmPayment,
-  getMyPayments
+  getMyPayments,
+  getLandlordPayments,
 };
