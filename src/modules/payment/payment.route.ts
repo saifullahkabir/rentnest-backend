@@ -24,4 +24,10 @@ router.get(
   paymentController.getLandlordPayments,
 );
 
+router.get(
+  "/:id",
+  auth(),
+  paymentController.getSinglePayment,
+);
+
 export const paymentRoutes = router;

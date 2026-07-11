@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { paymentService } from "./payment.service";
+import { UserRole } from "../../../generated/prisma/enums";
 
 const createPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -64,9 +65,29 @@ const getLandlordPayments = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSinglePayment = catchAsync(async (req: Request, res: Response) => {
+  const paymentId = req.params.id as string;
+  const userId = req.user?.id as string;
+  const userRole = req.user?.role as UserRole;
+
+  const result = await paymentService.getSinglePayment(
+    paymentId,
+    userId,
+    userRole,
+  );
+
+  return sendResponse(res, {
+    success: true,
+    statusCode: HttpStatus.OK,
+    message: "Payment retrieved successfully.",
+    data: result,
+  });
+});
+
 export const paymentController = {
   createPayment,
   confirmPayment,
   getMyPayments,
   getLandlordPayments,
+  getSinglePayment,
 };

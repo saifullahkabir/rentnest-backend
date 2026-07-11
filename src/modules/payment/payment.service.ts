@@ -6,6 +6,7 @@ import {
   PaymentProvider,
   PaymentStatus,
   RentalRequestStatus,
+  UserRole,
 } from "../../../generated/prisma/enums";
 import config from "../../config";
 import { stripe } from "../../lib/stripe";
@@ -201,9 +202,68 @@ const getLandlordPayments = async (landlordId: string) => {
   return result;
 };
 
+const getSinglePayment = async (
+  paymentId: string,
+  userId: string,
+  userRole: UserRole,
+) => {
+  const payment = await prisma.payment.findUnique({
+    where: {
+      id: paymentId,
+    },
+    include: {
+      tenant: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profileImage: true,
+        },
+      },
+      rentalRequest: {
+        include: {
+          property: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!payment) {
+    throw new AppError(HttpStatus.NOT_FOUND, "Payment not found.");
+  }
+
+  //* Admin can access any payment
+  if (userRole === UserRole.ADMIN) {
+    return payment;
+  }
+
+  //* Tenant can access only their payment
+  if (userRole === UserRole.TENANT && payment.tenantId === userId) {
+    return payment;
+  }
+
+  //* Landlord can access only their property's payment
+  if (
+    userRole === UserRole.LANDLORD &&
+    payment.rentalRequest.property.landlordId === userId
+  ) {
+    return payment;
+  }
+
+  throw new AppError(
+    HttpStatus.FORBIDDEN,
+    "You are not allowed to access this payment.",
+  );
+};
+
 export const paymentService = {
   createPayment,
   confirmPayment,
   getMyPayments,
   getLandlordPayments,
+  getSinglePayment
 };
