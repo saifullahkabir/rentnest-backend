@@ -73,6 +73,57 @@ const createReview = async (tenantId: string, payload: ICreateReview) => {
   return result;
 };
 
+const getPropertyReviews = async (propertyId: string) => {
+  const property = await prisma.property.findUnique({
+    where: {
+      id: propertyId,
+    },
+  });
+
+  if (!property) {
+    throw new AppError(HttpStatus.NOT_FOUND, "Property not found.");
+  }
+
+  const result = await prisma.review.findMany({
+    where: {
+      propertyId,
+    },
+
+    include: {
+      tenant: {
+        select: {
+          id: true,
+          name: true,
+          profileImage: true,
+        },
+      },
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const average = await prisma.review.aggregate({
+    where: {
+      propertyId,
+    },
+
+    _avg: {
+      rating: true,
+    },
+
+    _count: true,
+  });
+
+  return {
+    averageRating: average._avg.rating ?? 0,
+    totalReviews: average._count,
+    reviews: result,
+  };
+};
+
 export const reviewService = {
   createReview,
+  getPropertyReviews,
 };
