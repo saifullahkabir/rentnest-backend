@@ -7,8 +7,8 @@ model Payment {
   tenantId String
   tenant   User   @relation(fields: [tenantId], references: [id])
 
-  transactionId   String @unique
-  stripeSessionId String
+  transactionId   String? @unique
+  stripeSessionId String?
 
   amount Float
 
