@@ -14,11 +14,11 @@ router.get("/users", auth(UserRole.ADMIN), adminController.getAllUsers);
 //   adminController.getAllProperties,
 // );
 
-// router.get(
-//   "/rental-requests",
-//   auth(UserRole.ADMIN),
-//   adminController.getAllRentalRequests,
-// );
+router.get(
+  "/rental-requests",
+  auth(UserRole.ADMIN),
+  adminController.getAllRentalRequests,
+);
 
 router.patch(
   "/users/:id",
