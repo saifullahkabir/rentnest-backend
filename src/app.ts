@@ -8,6 +8,7 @@ import { notFound } from "./middlewares/notFound";
 import { categoryRoutes } from "./modules/category/category.route";
 import { propertyRoutes } from "./modules/property/property.route";
 import { rentalRequestRoutes } from "./modules/rentalRequest/rentalRequest.route";
+import { paymentRoutes } from "./modules/payment/payment.route";
 
 const app: Application = express();
 
@@ -17,6 +18,8 @@ app.use(
     credentials: true,
   }),
 );
+
+app.use("/api/payments/confirm", express.raw({ type: "application/json" }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -33,6 +36,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/rental-requests", rentalRequestRoutes);
+app.use("/api/payments", paymentRoutes);
 
 app.use(notFound);
 app.use(globalErrorHandler);

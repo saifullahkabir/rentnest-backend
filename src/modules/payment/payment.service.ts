@@ -9,6 +9,8 @@ import {
 } from "../../../generated/prisma/enums";
 import config from "../../config";
 import { stripe } from "../../lib/stripe";
+import { handleCheckoutCompleted } from "./payment.utils";
+import Stripe from "stripe";
 
 const createPayment = async (tenantId: string, payload: ICreatePayment) => {
   const request = await prisma.rentalRequest.findUnique({
@@ -17,6 +19,7 @@ const createPayment = async (tenantId: string, payload: ICreatePayment) => {
     },
     include: {
       property: true,
+      tenant: true,
     },
   });
 
@@ -54,6 +57,7 @@ const createPayment = async (tenantId: string, payload: ICreatePayment) => {
   // Stripe Checkout Session
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
+    customer_email: request.tenant.email,
 
     payment_method_types: ["card"],
 
@@ -83,6 +87,13 @@ const createPayment = async (tenantId: string, payload: ICreatePayment) => {
     },
   });
 
+  if (!session.url) {
+    throw new AppError(
+      HttpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to create payment session.",
+    );
+  }
+
   await prisma.payment.create({
     data: {
       rentalRequestId: request.id,
@@ -103,6 +114,29 @@ const createPayment = async (tenantId: string, payload: ICreatePayment) => {
   };
 };
 
+const confirmPayment = async (payload: Buffer, signature: string) => {
+  const endpointSecret = config.stripe_webhook_secret;
+
+  const event = stripe.webhooks.constructEvent(
+    payload,
+    signature,
+    endpointSecret,
+  );
+
+  switch (event.type) {
+    case "checkout.session.completed":
+      await handleCheckoutCompleted(
+        event.data.object as Stripe.Checkout.Session,
+      );
+
+      break;
+
+    default:
+      console.log(`Unhandled event type: ${event.type}`);
+  }
+};
+
 export const paymentService = {
   createPayment,
+  confirmPayment,
 };

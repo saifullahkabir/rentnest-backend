@@ -184,7 +184,11 @@ const updateRentalRequestStatus = async (
     },
 
     include: {
-      property: true,
+      property: {
+        select: {
+          landlordId: true,
+        },
+      },
     },
   });
 
@@ -240,17 +244,7 @@ const updateRentalRequestStatus = async (
       },
     });
 
-    //* 2. Property unavailable
-    await tx.property.update({
-      where: {
-        id: request.propertyId,
-      },
-      data: {
-        availability: PropertyAvailability.UNAVAILABLE,
-      },
-    });
-
-    //* 3. Other pending requests reject
+    //* 2. Other pending requests reject
     await tx.rentalRequest.updateMany({
       where: {
         propertyId: request.propertyId,
