@@ -50,8 +50,36 @@ const getAllRentalRequests = catchAsync(
   },
 );
 
+const getAllPayments = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await adminService.getAllPayments();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatus.OK,
+      message: "Payments retrieved successfully.",
+      data: result,
+    });
+  },
+);
+
+const getAllProperties = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await adminService.getAllProperties();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatus.OK,
+      message: "Properties retrieved successfully.",
+      data: result,
+    });
+  },
+);
+
 export const adminController = {
   getAllUsers,
   updateUserStatus,
   getAllRentalRequests,
+  getAllPayments,
+  getAllProperties,
 };

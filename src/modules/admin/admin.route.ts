@@ -3,22 +3,23 @@ import { auth } from "../../middlewares/auth";
 import { UserRole } from "../../../generated/prisma/enums";
 import { adminController } from "./admin.controller";
 
-
 const router = Router();
 
 router.get("/users", auth(UserRole.ADMIN), adminController.getAllUsers);
 
-// router.get(
-//   "/properties",
-//   auth(UserRole.ADMIN),
-//   adminController.getAllProperties,
-// );
+router.get(
+  "/properties",
+  auth(UserRole.ADMIN),
+  adminController.getAllProperties,
+);
 
 router.get(
-  "/rental-requests",
+  "/rentals",
   auth(UserRole.ADMIN),
   adminController.getAllRentalRequests,
 );
+
+router.get("/payments", auth(UserRole.ADMIN), adminController.getAllPayments);
 
 router.patch(
   "/users/:id",
